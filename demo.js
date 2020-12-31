@@ -14,7 +14,7 @@ class Demo {
     this.cacheSeconds = 2; // 提前2s下载
     this.totalLength = 0; // 视频总共大小
     this.segmentStart = 0; // rangeStart
-    this.segmentSize = 1024 * 1024; // 分段大小
+    this.segmentSize = 1024 * 1024 * 0.4; // 分段大小
 
     this.init();
   }
@@ -65,7 +65,7 @@ class Demo {
     const initRange = this.calculateRange();
     const initData = await this.fetchVideo(initRange);
     this.updateSegmentStart(initRange);
-    this.sourceBuffer.appendBuffer(new Uint8Array(initData));
+    this.sourceBuffer.appendBuffer(initData);
 
     this.sourceBuffer.addEventListener("updateend", this.updateFunct, false);
   }
@@ -76,30 +76,27 @@ class Demo {
   }
 
   updateFunct = async () => {
-    // updateend只监听一次
-    // 视频开始播放后，监听视频的timeupdate来决定是否继续请求数据
-
-    this.sourceBuffer.removeEventListener("updateend", this.updateFunct);
-
-    this.bindVideoEvent();
+    if (this.video.buffered.length) {
+      // 视频开始能播放后，监听视频的timeupdate来决定是否继续请求数据
+      this.sourceBuffer.removeEventListener("updateend", this.updateFunct);
+      this.bindVideoEvent();
+    } else {
+      // 继续加载初始化数据，直到视频能够播放，才能触发timeupdate事件
+      const initRange = this.calculateRange();
+      const initData = await this.fetchVideo(initRange);
+      this.updateSegmentStart(initRange);
+      this.sourceBuffer.appendBuffer(initData);
+    }
   }
 
   bindVideoEvent = () => {
-    this.video.addEventListener("timeupdate", this.timelineCheck, false);
-    this.video.addEventListener("seeking", this.seekingCheck, false);
+    this.video.addEventListener("timeupdate", this.timeupdate, false);
   }
 
-  seekingCheck = () => {
-    // Todo
-    // 如果跳转的时间在缓冲区，则没问题
-    // 不在缓冲区，则重新调整range，发起请求数据
-    console.log('seekingCheck');
-  }
-
-  timelineCheck = async () => {
+  timeupdate = async () => {
     if (this.totalLength && this.segmentStart >= this.totalLength) {
       // 已经所有数据请求完成
-      this.video.removeEventListener("timeupdate", this.timelineCheck, false);
+      this.video.removeEventListener("timeupdate", this.timeupdate, false);
     } else {
       // 判断当前视频播放时间是否不够了。如果不够了则继续请求分段数据
       const needFetch = this.isNeedFetch();
@@ -107,7 +104,7 @@ class Demo {
         const range = this.calculateRange();
         const data = await this.fetchVideo(range);
         this.updateSegmentStart(range);
-        this.sourceBuffer.appendBuffer(new Uint8Array(data));
+        this.sourceBuffer.appendBuffer(data);
       }
     }
   }
