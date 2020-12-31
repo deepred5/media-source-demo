@@ -1,0 +1,12 @@
+{
+  "name": "video-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server -p 4444 -c-1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
