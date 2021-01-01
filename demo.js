@@ -5,7 +5,7 @@
 class Demo {
   constructor() {
     this.video = document.querySelector('video');
-    this.baseUrl = '/demo_dashinit.mp4';
+    this.baseUrl = './demo_dashinit.mp4';
     this.mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     this.mediaSource = null;
     this.sourceBuffer = null;
