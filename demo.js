@@ -5,7 +5,7 @@
 class Demo {
   constructor() {
     this.video = document.querySelector('video');
-    this.baseUrl = '/demo_dashinit.mp4';
+    this.baseUrl = './demo_dashinit.mp4';
     this.mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     this.mediaSource = null;
     this.sourceBuffer = null;
@@ -14,7 +14,7 @@ class Demo {
     this.cacheSeconds = 2; // 提前2s下载
     this.totalLength = 0; // 视频总共大小
     this.segmentStart = 0; // rangeStart
-    this.segmentSize = 1024 * 1024 * 0.4; // 分段大小
+    this.segmentSize = 1024 * 1024 * 1; // 分段大小
 
     this.init();
   }
